@@ -22,6 +22,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 Route::get('guests', [GuestController::class, 'index']);
 Route::post('guests', [GuestController::class, 'store']);
+Route::patch('guests/{id}', [GuestController::class, 'update']);
+Route::delete('guests/{id}', [GuestController::class, 'destroy']);
 
 
 
@@ -29,7 +31,11 @@ Route::post('guests', [GuestController::class, 'store']);
 
 Route::get('hotel-books', [HotelBookController::class, 'index']);
 Route::post('hotel-books', [HotelBookController::class, 'store']);
+Route::patch('hotel-books/{id}', [HotelBookController::class, 'update']);
+Route::delete('hotel-books/{id}', [HotelBookController::class, 'destroy']);
 
 
 Route::get('rooms', [RoomController::class, 'index']);
 Route::post('rooms', [RoomController::class, 'store']);
+Route::patch('rooms/{id}', [RoomController::class, 'update']);
+Route::delete('rooms/{id}', [RoomController::class, 'destroy']);
