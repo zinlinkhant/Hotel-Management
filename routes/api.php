@@ -27,8 +27,6 @@ Route::delete('guests/{id}', [GuestController::class, 'destroy']);
 
 
 
-
-
 Route::get('hotel-books', [HotelBookController::class, 'index']);
 Route::post('hotel-books', [HotelBookController::class, 'store']);
 Route::patch('hotel-books/{id}', [HotelBookController::class, 'update']);
