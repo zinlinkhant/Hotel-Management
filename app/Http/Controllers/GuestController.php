@@ -58,10 +58,6 @@ class GuestController extends Controller
             $guest->gender = $request->input('gender');
             $guest->save();
 
-            $room = Room::find($request->input('room_id'));
-            $room->active = false;
-            $room->save();
-
             return response()->json($guest, 201);
         } catch (\Exception $e) {
             return response()->json([

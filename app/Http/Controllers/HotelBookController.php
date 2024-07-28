@@ -24,43 +24,60 @@ class HotelBookController extends Controller
     public function store(Request $request)
     {
         try {
-
-            $request->validate([
+            // Validate the request
+            $validator = Validator::make($request->all(), [
                 'room_id' => 'required|exists:rooms,id',
                 'guest_id' => 'required|exists:guests,id',
                 'check_in_date' => 'required|date',
                 'check_out_date' => 'required|date|after:check_in_date',
+                'num_of_people' => 'required',
             ]);
 
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 400);
+            }
 
-
-
+            // Create a new HotelBook instance
             $hotelBook = new HotelBook();
             $hotelBook->room_id = $request->input('room_id');
-            $room = Room::find($hotelBook->room_id);
+            $room = Room::findOrFail($hotelBook->room_id); // Ensure room exists
             $hotelBook->guest_id = $request->input('guest_id');
+            $hotelBook->num_of_people = $request->input('num_of_people');
             $hotelBook->check_in_date = $request->input('check_in_date');
             $hotelBook->check_out_date = $request->input('check_out_date');
 
+            // Calculate the price based on the number of days
             $checkIn = Carbon::parse($hotelBook->check_in_date);
             $checkOut = Carbon::parse($hotelBook->check_out_date);
             $daysDifference = $checkIn->diffInDays($checkOut);
-
-            $hotelBook->num_of_people = $room->num_of_people;
             $hotelBook->price = $daysDifference * $room->price;
+            if ($hotelBook->num_of_people > $room->num_of_people) {
+                $extraPeople = $hotelBook->num_of_people - $room->num_of_people;
+                $extraMoney = $extraPeople * 250;
+            }
+            $hotelBook->price = $hotelBook->price + $extraMoney;
 
-            $booking = HotelBook::where('guest_id', $hotelBook->guest_id)
+            // Check if the booking already exists
+            $existingBooking = HotelBook::where('guest_id', $hotelBook->guest_id)
                 ->where('room_id', $hotelBook->room_id)
                 ->where('check_in_date', $hotelBook->check_in_date)
                 ->first();
 
-            if ($booking) {
-                return "hotel book already exist";
+            if ($existingBooking) {
+                return response()->json(['message' => 'Hotel booking already exists'], 409);
             }
 
+            if ($room->active) {
+                $room->active = false;
+                $room->save();
+            } else {
+                return "room is not available";
+            }
+
+            // Save the hotel booking
             $hotelBook->save();
 
-            return response()->json($hotelBook);
+            return response()->json($hotelBook, 201);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'An error occurred while processing your request.',

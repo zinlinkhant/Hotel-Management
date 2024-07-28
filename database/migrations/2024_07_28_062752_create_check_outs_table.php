@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('hotel_books', function (Blueprint $table) {
+        Schema::create('check_outs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('room_id')->constrained('rooms')->onDelete('cascade');
+            $table->integer("price");
             $table->foreignId('guest_id')->constrained('guests')->onDelete('cascade');
-            $table->date('check_in_date');
-            $table->date('check_out_date');
-            $table->integer('price');
-            $table->integer('num_of_people');
-            $table->boolean('payed')->default(false);
+            $table->foreignId('room_id')->constrained('rooms')->onDelete('cascade');
+            $table->foreignId('hotelbook_id')->constrained('hotel_books')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -29,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('hotel_books');
+        Schema::dropIfExists('check_outs');
     }
 };

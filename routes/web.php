@@ -20,16 +20,3 @@ Route::get('/', function () {
     return view('welcome');
 });
 // Route::resource('guests', GuestController::class);
-Route::get('guests', [GuestController::class, 'index']);
-Route::post('guests', [GuestController::class, 'store']);
-
-
-
-
-
-Route::get('hotel-books', [HotelBookController::class, 'index']);
-Route::post('hotel-books', [HotelBookController::class, 'store']);
-
-
-Route::get('rooms', [RoomController::class, 'index']);
-Route::post('rooms', [RoomController::class, 'store']);
