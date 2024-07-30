@@ -3,6 +3,8 @@
 use App\Http\Controllers\CheckOutController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\HotelBookController;
+use App\Http\Controllers\InvetoryController;
+use App\Http\Controllers\ReviewsController;
 use App\Http\Controllers\RoomController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -41,3 +43,13 @@ Route::get('check-outs', [CheckOutController::class, 'index']);
 Route::post('check-outs', [CheckOutController::class, 'store']);
 Route::patch('check-outs/{id}', [CheckOutController::class, 'update']);
 Route::delete('check-outs/{id}', [CheckOutController::class, 'destroy']);
+
+Route::get('reviews', [ReviewsController::class, 'index']);
+Route::post('reviews', [ReviewsController::class, 'store']);
+Route::patch('reviews/{id}', [ReviewsController::class, 'update']);
+Route::delete('reviews/{id}', [ReviewsController::class, 'destroy']);
+
+Route::get('invetories', [InvetoryController::class, 'index']);
+Route::post('invetories', [InvetoryController::class, 'store']);
+Route::patch('invetories/{id}', [InvetoryController::class, 'update']);
+Route::delete('invetories/{id}', [InvetoryController::class, 'destroy']);

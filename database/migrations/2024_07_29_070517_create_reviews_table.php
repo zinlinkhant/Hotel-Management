@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('check_outs', function (Blueprint $table) {
+        Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            $table->integer("price");
             $table->foreignId('guest_id')->constrained('guests')->onDelete('cascade');
             $table->foreignId('room_id')->constrained('rooms')->onDelete('cascade');
-            $table->foreignId('hotelbook_id')->constrained('hotel_books')->onDelete('cascade');
-            $table->enum('payment_method', ['wave', 'kpay', 'cash']);
+            $table->tinyInteger('rating')->unsigned()->check('rating <= 10');
+            $table->string('text');
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('check_outs');
+        Schema::dropIfExists('reviews');
     }
 };

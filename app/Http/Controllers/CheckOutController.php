@@ -33,12 +33,14 @@ class CheckOutController extends Controller
             $hotelbook = HotelBook::findOrFail($request->input('hotelbook_id'));
             $checkOut = new CheckOut();
             $checkOut->hotelbook_id = $request->input('hotelbook_id');
+            $checkOut->payment_method = $request->input('payment_method');
             $checkOut->price = $hotelbook->price;
             $checkOut->guest_id = $hotelbook->guest_id;
             $checkOut->room_id = $hotelbook->room_id;
             $hotelbook->payed = true;
             $hotelbook->save();
-
+            $hotelbook->room->active = true;
+            $hotelbook->room->save();
             $checkOut->save();
             $checkOut->load(['hotelBook.guest', 'hotelBook.room']);
             return response()->json($checkOut, 201);

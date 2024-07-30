@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Guest;
 use App\Models\HotelBook;
 use App\Models\Room;
 use Carbon\Carbon;
@@ -53,6 +54,7 @@ class HotelBookController extends Controller
             $hotelBook->price = $daysDifference * $room->price;
             if ($hotelBook->num_of_people > $room->num_of_people) {
                 $extraPeople = $hotelBook->num_of_people - $room->num_of_people;
+                $extraPeople = $daysDifference + $extraPeople;
                 $extraMoney = $extraPeople * 250;
             }
             $hotelBook->price = $hotelBook->price + $extraMoney;
@@ -73,8 +75,10 @@ class HotelBookController extends Controller
             } else {
                 return "room is not available";
             }
-
-            // Save the hotel booking
+            $guest = Guest::findOrFail($hotelBook->guest_id);
+            $addPoint = ceil($hotelBook->price / 100);
+            $guest->points = $guest->points + $addPoint;
+            $guest->save();
             $hotelBook->save();
 
             return response()->json($hotelBook, 201);
