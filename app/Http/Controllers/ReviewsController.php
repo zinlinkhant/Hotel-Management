@@ -21,17 +21,8 @@ class ReviewsController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function store(Request $request)
     {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreReviewsRequest $request)
-    {
-        return "hello";
         $request->validate([
             'room_id' => 'required|exists:rooms,id',
             'guest_id' => 'required|exists:guests,id',
@@ -42,6 +33,14 @@ class ReviewsController extends Controller
         $review = Reviews::create($request->all());
         return response()->json($review, 201);
     }
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
 
     /**
      * Display the specified resource.

@@ -25,4 +25,8 @@ class HotelBook extends Model
     {
         return $this->hasOne(CheckOut::class);
     }
+    public function orders()
+    {
+        return $this->belongsTo(Order::class);
+    }
 }
