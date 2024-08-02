@@ -15,12 +15,12 @@ class Order extends Model
         'price',
     ];
 
-    public function invetories()
+    public function invetory()
     {
         return $this->hasOne(Invetory::class);
     }
 
-    public function hotel_books()
+    public function hotel_book()
     {
         return $this->hasOne(HotelBook::class);
     }

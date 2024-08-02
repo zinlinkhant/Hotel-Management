@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
+use App\Models\Guest;
 use App\Models\HotelBook;
 use App\Models\Invetory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -35,16 +36,16 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        // $request->validate([
-        //     'invetory_id' => 'required|exists:invetories,id', // intentional typo
-        //     'hotel_book_id' => 'required|exists:hotel_books,id',
-        //     'quantity' => 'required|integer',
-        // ]);
+        $request->validate([
+            'invetory_id' => 'required|exists:invetories,id',
+            'hotelbook_id' => 'required|exists:hotel_books,id',
+            'quantity' => 'required|integer',
+        ]);
 
         try {
-            $item = Invetory::findOrFail($request->invetory_id); // intentional typo
+            $item = Invetory::findOrFail($request->invetory_id);
             $price = $item->price * $request->quantity;
-            // return $request->quantity;
+
             $order = new Order();
             $order->fill([
                 'invetory_id' => $request->invetory_id,
@@ -52,17 +53,24 @@ class OrderController extends Controller
                 'quantity' => $request->quantity,
                 'price' => $price,
             ]);
-            $hotel = HotelBook::find($request->hotelbook_id)->first();
+
+            $hotel = HotelBook::findOrFail($request->hotelbook_id);
             $addPrice = $hotel->price + $price;
             $hotel->price = $addPrice;
+
+            $guest = Guest::findOrFail($hotel->guest_id);
+            $addPoint = ceil($price / 100);
+            $guest->points = $guest->points + $addPoint;
+
             $hotel->save();
+            $guest->save();
             $order->save();
+
 
             return response()->json($order, 201);
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'Inventory item not found'], 404);
         } catch (\Exception $e) {
-            // Log the exception details
             Log::error('Order creation failed', ['exception' => $e]);
             return response()->json(['error' => 'An error occurred while creating the order'], 500);
         }

@@ -31,7 +31,7 @@ class HotelBookController extends Controller
                 'guest_id' => 'required|exists:guests,id',
                 'check_in_date' => 'required|date',
                 'check_out_date' => 'required|date|after:check_in_date',
-                'num_of_people' => 'required',
+                'num_of_people' => 'required|integer',
             ]);
 
             if ($validator->fails()) {
@@ -52,12 +52,13 @@ class HotelBookController extends Controller
             $checkOut = Carbon::parse($hotelBook->check_out_date);
             $daysDifference = $checkIn->diffInDays($checkOut);
             $hotelBook->price = $daysDifference * $room->price;
+
+            $extraMoney = 0; // Initialize extraMoney to avoid undefined variable error
             if ($hotelBook->num_of_people > $room->num_of_people) {
                 $extraPeople = $hotelBook->num_of_people - $room->num_of_people;
-                $extraPeople = $daysDifference + $extraPeople;
-                $extraMoney = $extraPeople * 250;
+                $extraMoney = $daysDifference * $extraPeople * 250;
             }
-            $hotelBook->price = $hotelBook->price + $extraMoney;
+            $hotelBook->price += $extraMoney;
 
             // Check if the booking already exists
             $existingBooking = HotelBook::where('guest_id', $hotelBook->guest_id)
@@ -73,12 +74,14 @@ class HotelBookController extends Controller
                 $room->active = false;
                 $room->save();
             } else {
-                return "room is not available";
+                return response()->json(['message' => 'Room is not available'], 409);
             }
+
             $guest = Guest::findOrFail($hotelBook->guest_id);
             $addPoint = ceil($hotelBook->price / 100);
-            $guest->points = $guest->points + $addPoint;
+            $guest->points += $addPoint;
             $guest->save();
+
             $hotelBook->save();
 
             return response()->json($hotelBook, 201);

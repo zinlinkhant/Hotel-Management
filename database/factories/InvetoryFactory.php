@@ -17,7 +17,8 @@ class InvetoryFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->word,
+            'price' => $this->faker->numberBetween(50, 500)
         ];
     }
 }

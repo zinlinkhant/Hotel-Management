@@ -12,19 +12,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
-
-        // \App\Models\Room::factory(10)->create();
-
-        // \App\Models\Room::factory()->create([
-        //     'number' =>,
-        //     'name' => 'Delux room',
-        //     'price' => 100,
-        // ]);
+        $this->call(RoomSeeder::class);
+        $this->call(InvetorySeeder::class);
+        $this->call(GuestSeeder::class);
     }
 }

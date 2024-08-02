@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CheckOut;
 use App\Http\Requests\StoreCheckOutRequest;
 use App\Http\Requests\UpdateCheckOutRequest;
+use App\Models\Guest;
 use App\Models\HotelBook;
 use Illuminate\Http\Request;
 
@@ -27,7 +28,7 @@ class CheckOutController extends Controller
     {
         try {
             $request->validate([
-                'hotelbook_id' => 'required|exists:hotel_books,id', // Ensure it exists in the hotel_books table
+                'hotelbook_id' => 'required|exists:hotel_books,id',
             ]);
 
             $hotelbook = HotelBook::findOrFail($request->input('hotelbook_id'));
@@ -38,9 +39,28 @@ class CheckOutController extends Controller
             $checkOut->guest_id = $hotelbook->guest_id;
             $checkOut->room_id = $hotelbook->room_id;
             $hotelbook->payed = true;
-            $hotelbook->save();
             $hotelbook->room->active = true;
+            $guest = Guest::findOrFail($hotelbook->guest->id);
+
+            if ($request->has('point') && $request->point > 0) {
+                $pointsToUse = $request->point;
+
+                if ($pointsToUse > $guest->points) {
+                    $pointsToUse = $guest->points;
+                }
+
+                $guest->points -= $pointsToUse;
+                $checkOut->price -= $pointsToUse;
+
+                if ($checkOut->price < 0) {
+                    $checkOut->price = 0;
+                }
+
+                $guest->save();
+            }
+
             $hotelbook->room->save();
+            $hotelbook->save();
             $checkOut->save();
             $checkOut->load(['hotelBook.guest', 'hotelBook.room']);
             return response()->json($checkOut, 201);
